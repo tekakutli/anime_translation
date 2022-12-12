@@ -16,7 +16,7 @@ make
 get audio.wav from video file for *whisper* to use
 
 ``` 
-ffmpeg -i "anime.mp4" -ar 16000 -ac 1 -c:a pcm_s16le audio.wav
+ffmpeg -i "video.mp4" -ar 16000 -ac 1 -c:a pcm_s16le audio.wav
 <path_to_whisper.cpp>/main -m <path_to_models>/ggml-large.bin -l ja -tr -f audio.wav -ovtt
 ``` 
 
@@ -31,7 +31,7 @@ the -tr flag activates translation into english, without it transcribes into jap
 get mpv to load some subs
 ``` 
 SUBS_FILE="<path_to_subs>/translation.vtt"
-mpv --sub-file="$SUBS_FILE" "anime.mp4"
+mpv --sub-file="$SUBS_FILE" "video.mp4"
 ``` 
 
 what subs?  
@@ -60,7 +60,15 @@ and copy next snippet into emacs config.el
   (add-hook 'subed-mode-hook (lambda () (setq-local fill-column 40))))
 ```
 now you can use (subed-mpv-play-from-file) and automatically sync what mpv is showing with what you have in focus at the .vtt
+## Scene Detection
+pip install scenedetect[opencv] --upgrade
 
+usage
+```
+scenedetect -i video.mp4 detect-adaptive list-scenes >> scenedetect_output.txt
+cat scenedetect_output.txt | grep \| | cut -d'|' -f4,6 | sed 's/|/--->/g' >> timestamps.txt
+tail -1 scenedetect_output.txt > timecodes.txt
+```
 ## Why X
 - Why Git over Google-Docs or similar?  
   - Version Control Systems (git) is an ergonomic tool to pick or disregard from contributions, it enables trully parallel work distribution
