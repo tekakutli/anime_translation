@@ -60,14 +60,28 @@ and copy next snippet into emacs config.el
   (add-hook 'subed-mode-hook (lambda () (setq-local fill-column 40))))
 ```
 now you can use (subed-mpv-play-from-file) and automatically sync what mpv is showing with what you have in focus at the .vtt
-## Scene Detection
+## Utils
+Scene Detection:
+```
 pip install scenedetect[opencv] --upgrade
-
-usage
+```
+Scene Detection usage:
 ```
 scenedetect -i video.mp4 detect-adaptive list-scenes >> scenedetect_output.txt
 cat scenedetect_output.txt | grep \| | cut -d'|' -f4,6 | sed 's/|/--->/g' >> timestamps.txt
 tail -1 scenedetect_output.txt > timecodes.txt
+```
+Speech Alignment:
+```
+pip install ffsubsync
+```
+Speech Alignment usage:
+```
+ffs video.mp4 -i unsynchronized.srt -o synchronized.srt
+```
+To .srt Conversion
+``` 
+ffmpeg -i file.vtt file.srt
 ```
 ## Why X
 - Why Git over Google-Docs or similar?  
