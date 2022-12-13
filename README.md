@@ -76,7 +76,7 @@ bash autosync.sh
 ```
 To .srt Conversion
 ``` 
-ffmpeg -i file.vtt file.srt
+ffmpeg -y -i file.vtt file.srt
 ```
 ## Get Event Timestamps
 Speech-timestamps: (first install [torch](https://pytorch.org/get-started/locally/))
@@ -91,6 +91,14 @@ pip install scenedetect[opencv] --upgrade
 scenedetect -i "$VIDEO_TO_SUB" detect-adaptive list-scenes >> scenedetect_output.txt
 cat scenedetect_output.txt | grep \| | cut -d'|' -f4,6 | sed 's/|/--->/g' >> timestamps.txt
 tail -1 scenedetect_output.txt > timecodes.txt
+```
+## Translate Speakers Stream
+you need to Ctrl-C to stop recording, then it will translate the recording
+```
+PATH_TO_WHISPER="/home/$USER/code/whisper.cpp"
+PATH_TO_MODELS="/home/$USER/models"
+LANG_FROM="ja"
+bash streamtranslate.sh
 ```
 ## Why X
 - Why Git over Google-Docs or similar?  
