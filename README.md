@@ -1,7 +1,14 @@
 # Anime Translation Initiative
 AI-helped transcription and translation
 ```
-wherever there is <path>, put your own paths
+# SET YOUR ENVIROMENT VARIABLES
+PATH_TO_WHISPER="whisper.cpp clone"
+PATH_TO_MODELS="models folder, like for ggml-large.bin"
+PATH_TO_SUBS="anime_translation clone"
+PATH_TO_SUBED="emacs_subed clone"
+VIDEO_TO_SUB="video.mp4"
+AUDIO_EXTRACT="doesnt_exist_yet_audio.wav"
+
 ```
 ## Setup
 used model: WHISPER  
@@ -15,11 +22,10 @@ make
 ```
 
 ## Model Usage
-get audio.wav from video file for *whisper* to use
-
+get audio from video file for *whisper* to use
 ``` 
-ffmpeg -i "video.mp4" -ar 16000 -ac 1 -c:a pcm_s16le audio.wav
-<path_to_whisper.cpp>/main -m <path_to_models>/ggml-large.bin -l ja -tr -f audio.wav -ovtt
+ffmpeg -i "$VIDEO_TO_SUB" -ar 16000 -ac 1 -c:a pcm_s16le "$AUDIO_EXTRACT"
+$PATH_TO_WHISPER/main -m $PATH_TO_MODELS/ggml-large.bin -l ja -tr -f "$AUDIO_EXTRACT" -ovtt
 ``` 
 
 the -tr flag activates translation into english, without it transcribes into japanese  
@@ -32,8 +38,8 @@ the -tr flag activates translation into english, without it transcribes into jap
 ## MPV 
 get mpv to load some subs
 ``` 
-SUBS_FILE="<path_to_subs>/translation.vtt"
-mpv --sub-file="$SUBS_FILE" "video.mp4"
+SUBS_FILE="$PATH_TO_SUBS/translation.vtt"
+mpv --sub-file="$SUBS_FILE" "$VIDEO_TO_SUB"
 ``` 
 
 what subs?  
@@ -46,7 +52,7 @@ git clone https://github.com/sachac/subed
 and copy next snippet into emacs config.el  
 
 ``` 
-(add-to-list 'load-path "<path_to_subed>/subed/subed")
+(add-to-list 'load-path "$PATH_TO_SUBED/subed/subed")
 (require 'subed-autoloads)
 
 (use-package! subed
@@ -75,14 +81,14 @@ ffmpeg -i file.vtt file.srt
 ## Get Event Timestamps
 Speech-timestamps: (first install [torch](https://pytorch.org/get-started/locally/))
 ```
-python vad.py "audio.wav" > audio_timecodes.txt
+python vad.py "$AUDIO_EXTRACT" > audio_timecodes.txt
 cat audio_timecodes.txt | awk '{gsub(/[:\47]/,"");print $0}' | awk '{gsub(/.{end /,"");print $0}' | awk '{gsub(/ start /,"");print $0}' | awk '{gsub(/}./,"");print $0}' | awk -F',' '{ print $2 "," $1}' | awk '{gsub(/,/,"\n");print $0}' | while read -r line; do date -d@$line -u '+%T.%2N'; done | paste -d " "  - - | sed 's/ / ---> /g' > audio_timestamps.txt
 ```
 Scene-timestamps:
 ```
 pip install scenedetect[opencv] --upgrade
 
-scenedetect -i video.mp4 detect-adaptive list-scenes >> scenedetect_output.txt
+scenedetect -i "$VIDEO_TO_SUB" detect-adaptive list-scenes >> scenedetect_output.txt
 cat scenedetect_output.txt | grep \| | cut -d'|' -f4,6 | sed 's/|/--->/g' >> timestamps.txt
 tail -1 scenedetect_output.txt > timecodes.txt
 ```
