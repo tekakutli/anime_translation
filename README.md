@@ -61,27 +61,28 @@ and copy next snippet into emacs config.el
 ```
 now you can use (subed-mpv-play-from-file) and automatically sync what mpv is showing with what you have in focus at the .vtt
 ## Utils
-Scene Detection:
-```
-pip install scenedetect[opencv] --upgrade
-```
-Scene Detection usage:
-```
-scenedetect -i video.mp4 detect-adaptive list-scenes >> scenedetect_output.txt
-cat scenedetect_output.txt | grep \| | cut -d'|' -f4,6 | sed 's/|/--->/g' >> timestamps.txt
-tail -1 scenedetect_output.txt > timecodes.txt
-```
-Speech Alignment:
+AutoSync subtitles:
 ```
 pip install ffsubsync
-```
-Speech Alignment usage:
-```
+
 ffs video.mp4 -i unsynchronized.srt -o synchronized.srt
 ```
 To .srt Conversion
 ``` 
 ffmpeg -i file.vtt file.srt
+```
+Get speech-timestamps: (first install [torch](https://pytorch.org/get-started/locally/))
+```
+python vad.py "audio.wav" > audio_timecodes.txt
+cat audio_timecodes.txt | awk '{gsub(/[:\47]/,"");print $0}' | awk '{gsub(/.{end /,"");print $0}' | awk '{gsub(/ start /,"");print $0}' | awk '{gsub(/}./,"");print $0}' | awk -F',' '{ print $2 "," $1}' | awk '{gsub(/,/,"\n");print $0}' | while read -r line; do date -d@$line -u '+%T.%2N'; done | paste -d " "  - - | sed 's/ / ---> /g' > audio_timestamps.txt
+```
+Get scene-timestamps:
+```
+pip install scenedetect[opencv] --upgrade
+
+scenedetect -i video.mp4 detect-adaptive list-scenes >> scenedetect_output.txt
+cat scenedetect_output.txt | grep \| | cut -d'|' -f4,6 | sed 's/|/--->/g' >> timestamps.txt
+tail -1 scenedetect_output.txt > timecodes.txt
 ```
 ## Why X
 - Why Git over Google-Docs or similar?  
