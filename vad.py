@@ -9,6 +9,8 @@ model, utils = torch.hub.load(repo_or_dir='snakers4/silero-vad',
                               model='silero_vad',
                               force_reload=True)
 
+# VAD means: Voice Activity Detector
+
 (get_speech_timestamps,
  _, read_audio,
  *_) = utils

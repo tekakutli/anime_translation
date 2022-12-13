@@ -19,7 +19,7 @@ PATH_TO_WHISPER="/home/$USER/code/whisper.cpp"
 PATH_TO_MODELS="/home/$USER/models"
 ```
 ## Workflow
-- I'm assuming you are using linux
+- I'm assuming you are using linux, and check Dependencies
 - More information about each component best researched in their own websites
 - The main workflow is as follows: 
   - Setup the Model, based on Whisper, and use it to translate directly from japanese audio to english text
@@ -179,6 +179,15 @@ you need to Ctrl-C to stop recording, then it will translate the temporal record
 ```
 bash streamtranslate.sh
 ```
+## Dependencies
+- Linux, Bash, Mpv, Ffmpeg, Emacs, Subed
+- Whatever model you wish to use
+- Python if you use the "Get Event Timestamps" things
+  - The vad.py thing downloads silero-vad by itself 
+- Docker for the LibreGrammar(Language Tool) or the Opus things
+- If you want to translate your Speakers, you need pipewire 
+  - As commodity, you will need: wl-copy and wl-paste, if running on wayland
+    - If you don't want them, remove them from streamtranslate.sh
 ## Why X
 - Why Git over Google-Docs or similar?  
   - Version Control Systems (git) is an ergonomic tool to pick or disregard from contributions, it enables trully parallel work distribution
