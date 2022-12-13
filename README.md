@@ -29,7 +29,7 @@ PATH_TO_MODELS="/home/$USER/models"
     - I propose the usage of Subed, which is an Emacs package
       - Subed allows us to:
         - Watch where are captioning in MPV
-        - Efficiently move the timestamps, in miliseconds
+        - Efficiently move the timestamps, in milliseconds
   - Then, to fix grammar or spelling mistakes, we can use the Language-Tool
   - Finally, we can load the .vtt file with mpv and enjoy
 - Some extra tools at your disposal:
@@ -59,7 +59,7 @@ the -tr flag activates translation into english, without it transcribes into jap
 ##### Warning
 - it often breaks with music segments  
 - if you see it start outputing the same thing over and over, stop it
-  - then use the -ot *miliseconds* flag to resume at that point
+  - then use the -ot *milliseconds* flag to resume at that point
 
 ### MPV 
 get mpv to load some subs
@@ -103,6 +103,12 @@ bash autosync.sh
 To .srt Conversion
 ``` 
 ffmpeg -y -i file.vtt file.srt
+```
+To format a given time in milliseconds or as timestamps
+```
+source timeformat.sh
+milliformat "2.3" #2 minutes 3 seconds
+stampformat "3.2.1" #3 hours 2 minutes 1 second
 ```
 #### Grammar-Spelling Checking - Language Tool
 Install full-version of Language Tool
@@ -154,7 +160,6 @@ To activate:
 ```
 source opus.sh
 Opus-MT
-
 ```
 To use: (This one file, opus.sh, is better if you check it yourself to properly understand-edit it)
 ```
