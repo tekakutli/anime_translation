@@ -1,0 +1,29 @@
+{
+    "Japanese": {
+        "en": {
+            "configuration": "models/ja-en/decoder.yml",
+            "sourcespm": "./models/ja-en/source.spm",
+            "targetspm": "./models/ja-en/target.spm",
+            "host": "localhost",
+            "port": "10001"
+        }
+    },
+    "Mandarin": {
+        "en": {
+            "configuration": "models/zho-eng/decoder.yml",
+            "sourcespm": "./models/zho-eng/source.spm",
+            "targetspm": "./models/zho-eng/target.spm",
+            "host": "localhost",
+            "port": "10002"
+        }
+    },
+    "en": {
+        "Mandarin": {
+            "configuration": "models/eng-zho/decoder.yml",
+            "sourcespm": "./models/eng-zho/source.spm",
+            "targetspm": "./models/eng-zho/target.spm",
+            "host": "localhost",
+            "port": "10003"
+        }
+    }
+}
