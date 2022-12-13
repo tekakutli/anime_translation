@@ -1,6 +1,8 @@
 # Anime Translation Initiative
 AI-helped transcription and translation
-
+```
+wherever there is <path>, put your own paths
+```
 ## Setup
 used model: WHISPER  
 works offline  
