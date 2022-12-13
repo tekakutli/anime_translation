@@ -64,19 +64,19 @@ now you can use (subed-mpv-play-from-file) and automatically sync what mpv is sh
 AutoSync subtitles:
 ```
 pip install ffsubsync
-
-ffs video.mp4 -i unsynchronized.srt -o synchronized.srt
+bash autosync.sh
 ```
 To .srt Conversion
 ``` 
 ffmpeg -i file.vtt file.srt
 ```
-Get speech-timestamps: (first install [torch](https://pytorch.org/get-started/locally/))
+## Get Event Timestamps
+Speech-timestamps: (first install [torch](https://pytorch.org/get-started/locally/))
 ```
 python vad.py "audio.wav" > audio_timecodes.txt
 cat audio_timecodes.txt | awk '{gsub(/[:\47]/,"");print $0}' | awk '{gsub(/.{end /,"");print $0}' | awk '{gsub(/ start /,"");print $0}' | awk '{gsub(/}./,"");print $0}' | awk -F',' '{ print $2 "," $1}' | awk '{gsub(/,/,"\n");print $0}' | while read -r line; do date -d@$line -u '+%T.%2N'; done | paste -d " "  - - | sed 's/ / ---> /g' > audio_timestamps.txt
 ```
-Get scene-timestamps:
+Scene-timestamps:
 ```
 pip install scenedetect[opencv] --upgrade
 
