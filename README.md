@@ -78,6 +78,31 @@ To .srt Conversion
 ``` 
 ffmpeg -y -i file.vtt file.srt
 ```
+### Grammar, Spelling Checking - Language Tool
+install full version of Language Tool
+```
+docker pull registry.gitlab.com/py_crash/docker-libregrammar
+```
+activate it
+```
+libregrammar (){
+     sudo systemctl start docker
+     sudo docker run -d --rm -it --name=libregrammar -p 8081:8081 registry.gitlab.com/py_crash/docker-libregrammar
+}
+libregrammar
+```
+emacs config.el
+```
+(setq langtool-http-server-host "localhost"
+      langtool-http-server-port 8081)
+;; (setq langtool-http-server-stream-type 'tls)
+(setq langtool-default-language "en-US")
+(require 'langtool)
+```
+emacs use
+```
+(langtool-check)
+```
 ## Get Event Timestamps
 Speech-timestamps: (first install [torch](https://pytorch.org/get-started/locally/))
 ```
@@ -92,7 +117,7 @@ scenedetect -i "$VIDEO_TO_SUB" detect-adaptive list-scenes >> scenedetect_output
 cat scenedetect_output.txt | grep \| | cut -d'|' -f4,6 | sed 's/|/--->/g' >> timestamps.txt
 tail -1 scenedetect_output.txt > timecodes.txt
 ```
-## Translate Speakers Stream
+## Translate the Speakers-Stream
 you need to Ctrl-C to stop recording, then it will translate the recording
 ```
 PATH_TO_WHISPER="/home/$USER/code/whisper.cpp"
