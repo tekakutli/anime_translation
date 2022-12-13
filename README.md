@@ -1,9 +1,8 @@
 # Anime Translation Initiative
 AI-helped transcription and translation  
-everything works offline  
+Everything works offline  
 ```
 # SET YOUR ENVIROMENT VARIABLES, IN YOUR .BASH_PROFILE
-# SET IF NEEDED
 PATH_TO_WHISPER="whisper.cpp clone"
 PATH_TO_MODELS="models folder, like for ggml-large.bin"
 PATH_TO_SUBS="anime_translation clone, this repo"
@@ -11,7 +10,7 @@ PATH_TO_SUBED="emacs_subed clone"
 VIDEO_TO_SUB="video.mp4"
 AUDIO_EXTRACT="doesnt_exist_yet_audio.wav"
 
-# NEEDED IF OPUS OR STREAMTRANSLATE
+# NEEDED IF: OPUS OR STREAMTRANSLATE
 PATH_TO_OPUS="Opus-MT clone"
 LANG_FROM="ja"
 
@@ -19,8 +18,26 @@ LANG_FROM="ja"
 PATH_TO_WHISPER="/home/$USER/code/whisper.cpp"
 PATH_TO_MODELS="/home/$USER/models"
 ```
+## Workflow
+- I'm assuming you are using linux
+- More information about each component best researched in their own websites
+- The main workflow is as follows: 
+  - Setup the Model, based on Whisper, and use it to translate directly from japanese audio to english text
+    - To get the audio formated appropriately, you use ffmpeg
+  - The timestamps often aren't completely aligned with the sound, so we can AutoSync with ffsubsync
+  - Next comes the human to fix the translation, split long captions, align them appropriately, etc
+    - I propose the usage of Subed, which is an Emacs package
+      - Subed allows us to:
+        - Watch where are captioning in MPV
+        - Efficiently move the timestamps, in miliseconds
+  - Then, to fix grammar or spelling mistakes, we can use the Language-Tool
+  - Finally, we can load the .vtt file with mpv and enjoy
+- Some extra tools at your disposal:
+  - The Opus Model is a text-to-text translator model, like Google-Translate
+  - There are two extra tools to align the captions: a Visual Scene Detector(Scene-timestamps), and a Human Voice Detector(Speech Timestamps)
+    - Often the captions align with those
+  - You can use Whisper to translate a snapshot of what you are hearing from your speakers, using the Speakers-Stream thing
 ## Setup
-
 ### Model Setup
 used model: WHISPER  
 download model *ggml-large.bin* from: https://huggingface.co/datasets/ggerganov/whisper.cpp
@@ -39,7 +56,7 @@ $PATH_TO_WHISPER/main -m $PATH_TO_MODELS/ggml-large.bin -l ja -tr -f "$AUDIO_EXT
 
 the -tr flag activates translation into english, without it transcribes into japanese  
 
-#### Warning
+##### Warning
 - it often breaks with music segments  
 - if you see it start outputing the same thing over and over, stop it
   - then use the -ot *miliseconds* flag to resume at that point
@@ -139,7 +156,7 @@ source opus.sh
 Opus-MT
 
 ```
-To use:
+To use: (This one file, opus.sh, is better if you check it yourself to properly understand-edit it)
 ```
 t "text to translate"
 ```
@@ -162,7 +179,7 @@ you need to Ctrl-C to stop recording, then it will translate the temporal record
 ```
 bash streamtranslate.sh
 ```
-### Why X
+## Why X
 - Why Git over Google-Docs or similar?  
   - Version Control Systems (git) is an ergonomic tool to pick or disregard from contributions, it enables trully parallel work distribution
 - Why .vtt over others?  
