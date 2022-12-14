@@ -104,6 +104,10 @@ To .srt Conversion
 ``` 
 ffmpeg -y -i file.vtt file.srt
 ```
+Export final .mp4 with subtitles
+```
+ffmpeg -i "$VIDEO_TO_SUB" -i "$PATH_TO_SUBS/translation.vtt" -c copy -c:s mov_text outfile.mp4
+```
 To format a given time in milliseconds or as timestamps
 ```
 source timeformat.sh
