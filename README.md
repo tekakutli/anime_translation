@@ -53,9 +53,7 @@ get audio from video file for *whisper* to use
 ffmpeg -i "$VIDEO_TO_SUB" -ar 16000 -ac 1 -c:a pcm_s16le "$AUDIO_EXTRACT"
 $PATH_TO_WHISPER/main -m $PATH_TO_MODELS/ggml-large.bin -l ja -tr -f "$AUDIO_EXTRACT" -ovtt
 ``` 
-
-the -tr flag activates translation into english, without it transcribes into japanese  
-
+the -tr flag activates translation into english, without it transcribes into japanese
 ##### Warning
 - it often breaks with music segments  
 - if you see it start outputing the same thing over and over, stop it
@@ -104,6 +102,12 @@ To .srt Conversion
 ``` 
 ffmpeg -y -i file.vtt file.srt
 ```
+Interruped model, copy and format from Terminal:
+```
+cat $1 | awk '{gsub(/\[/,"\n");print $0}' | awk '{gsub(/\]  /,"\n");print $0}' > $1.vtt
+rm $1
+```
+
 Export final .mp4 with subtitles
 ```
 ffmpeg -i "$VIDEO_TO_SUB" -i "$PATH_TO_SUBS/translation.vtt" -c copy -c:s mov_text outfile.mp4
