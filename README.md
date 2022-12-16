@@ -91,7 +91,8 @@ and copy next snippet into emacs config.el
    ;; Break lines at 40 characters
   (add-hook 'subed-mode-hook (lambda () (setq-local fill-column 40))))
 ```
-now you can use (subed-mpv-play-from-file) and automatically sync what mpv is showing with what you have in focus at the .vtt
+now you can use (subed-mpv-play-from-file) and automatically sync what mpv is showing with what you have in focus at the .vtt  
+you should also check out the functions at this [gist](https://gist.github.com/mooseyboots/d9a183795e5704d3f517878703407184) for more ease when moving around colliding timestamps
 ### Utils
 AutoSync subtitles:
 ```
