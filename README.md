@@ -94,7 +94,10 @@ and copy next snippet into emacs config.el
 now you can use (subed-mpv-play-from-file) and automatically sync what mpv is showing with what you have in focus at the .vtt  
 you should also check out the functions at this [gist](https://gist.github.com/mooseyboots/d9a183795e5704d3f517878703407184) for more ease when moving around colliding timestamps
 ### Utils
-AutoSync subtitles:
+AutoSync subtitles:  
+This ffsubsync-script first autosyncs japanese captions with japanese audio, and then uses those timestamps to sync english captions to japanese captions.  
+The japanese captions only need to be phonetically close, which means that we can use a smaller-faster model to get them instead, *ggml-small.bin* in this case.  
+This is the reason behind the names, why some are called whisper_small vs whisper_large (the model used).
 ```
 pip install ffsubsync
 bash autosync.sh
