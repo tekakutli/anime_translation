@@ -2,15 +2,15 @@
 AI-helped transcription and translation  
 Everything works offline  
 ```
-# SET YOUR ENVIROMENT VARIABLES, IN YOUR .BASH_PROFILE
+# SET YOUR PERSONAL ENVIROMENT VARIABLES (FILL APPROPRIATELY)
 PATH_TO_WHISPER="whisper.cpp clone"
 PATH_TO_MODELS="models folder, like for ggml-large.bin"
 PATH_TO_SUBS="anime_translation clone, this repo"
 PATH_TO_SUBED="emacs_subed clone"
-VIDEO_TO_SUB="video.mp4"
-AUDIO_EXTRACT="doesnt_exist_yet_audio.wav"
+VIDEO_TO_SUB="path/video.mp4"
+AUDIO_EXTRACT="path/doesnt_exist_yet_audio.wav"
 
-# NEEDED IF: OPUS OR STREAMTRANSLATE
+# NEEDED ONLY IF: OPUS OR STREAMTRANSLATE
 PATH_TO_OPUS="Opus-MT clone"
 LANG_FROM="ja"
 
@@ -22,21 +22,28 @@ PATH_TO_MODELS="/home/$USER/models"
 - I'm assuming you are using linux, and check Dependencies
 - More information about each component best researched in their own websites
 - The main workflow is as follows: 
-  - Setup the Model, based on Whisper, and use it to translate directly from japanese audio to english text
-    - To get the audio formated appropriately, you use ffmpeg
-  - The timestamps often aren't completely aligned with the sound, so we can AutoSync with ffsubsync
-  - Next comes the human to fix the translation, split long captions, align them appropriately, etc
+  - Setup the Model, Whisper here, and use it to translate directly from japanese audio to english text.
+    - To get the audio, formated appropriately, you use ffmpeg.
+    - [Instructions Here](#Model-Usage)
+  - The timestamps often aren't completely aligned with the sound, so we can use an AutoSync: ffsubsync.
+    - [Instructions Here](#AutoSync-the-Subs)
+  - Next comes the human to fix the translation, split long captions, further align them, etc.
     - I propose the usage of Subed, which is an Emacs package
       - Subed allows us to:
         - Watch where are captioning in MPV
-        - Efficiently move the timestamps, in milliseconds
+        - Efficiently move, merge, split the timestamps, with precision.
+      - [Instructions Here](#VTT-efficient-creation-or-edit)
   - Then, to fix grammar or spelling mistakes, we can use the Language-Tool
-  - Finally, we can load the .vtt file with mpv and enjoy
+    - [Instructions Here](#Grammar-Spelling-Checking-Language-Tool)
+  - Finally, we can load the .vtt file with mpv and enjoy, [Instructions Here](#MPV)
 - Some extra tools at your disposal:
   - The Opus Model is a text-to-text translator model, like Google-Translate
+    - [Instructions Here](#Local-Text-Translation)
   - There are two extra tools to align the captions: a Visual Scene Detector(Scene-timestamps), and a Human Voice Detector(Speech Timestamps)
     - Often the captions align with those
+    - [Instructions Here](#Get-Event-Timestamps)
   - You can use Whisper to translate a snapshot of what you are hearing from your speakers, using the Speakers-Stream thing
+    - [Instructions Here](#Translate-the-Speakers-Stream)
 ## Setup
 ### Model Setup
 used model: WHISPER  
@@ -55,10 +62,16 @@ $PATH_TO_WHISPER/main -m $PATH_TO_MODELS/ggml-large.bin -l ja -tr -f "$AUDIO_EXT
 ``` 
 the -tr flag activates translation into english, without it transcribes into japanese
 ##### Warning
-- it often breaks with music segments  
-- if you see it start outputing the same thing over and over, stop it
+- whisper often breaks with music segments  
+- if you see it start outputing the same thing over and over, interrupt it
   - then use the -ot *milliseconds* flag to resume at that point
-
+- After interrupting, copy from Terminal, then format appropriately with:
+```
+formatToVtt(){
+ cat $1 | awk '{gsub(/\[/,"\n");print $0}' | awk '{gsub(/\]  /,"\n");print $0}' > $1.vtt
+}
+formatToVtt terminaloutput.txt
+```
 ### MPV 
 get mpv to load some subs
 ``` 
@@ -69,7 +82,7 @@ mpv --sub-file="$SUBS_FILE" "$VIDEO_TO_SUB"
 what subs?  
 git clone https://github.com/tekakutli/anime_translation/
 
-### .vtt efficient creation or edit
+### VTT efficient creation or edit
 I use *subed*
 
 git clone https://github.com/sachac/subed  
@@ -93,8 +106,8 @@ and copy next snippet into emacs config.el
 ```
 now you can use (subed-mpv-play-from-file) and automatically sync what mpv is showing with what you have in focus at the .vtt  
 you should also check out the functions at this [gist](https://gist.github.com/mooseyboots/d9a183795e5704d3f517878703407184) for more ease when moving around colliding timestamps
-### Utils
-AutoSync subtitles:  
+
+### AutoSync the Subs
 This ffsubsync-script first autosyncs japanese captions with japanese audio, and then uses those timestamps to sync english captions to japanese captions.  
 The japanese captions only need to be phonetically close, which means that we can use a smaller-faster model to get them instead, *ggml-small.bin* in this case.  
 This is the reason behind the names, why some are called whisper_small vs whisper_large (the model used).
@@ -102,16 +115,11 @@ This is the reason behind the names, why some are called whisper_small vs whispe
 pip install ffsubsync
 bash autosync.sh
 ```
+### Other Utils
 To .srt Conversion
 ``` 
 ffmpeg -y -i file.vtt file.srt
 ```
-Interruped model, copy and format from Terminal:
-```
-cat $1 | awk '{gsub(/\[/,"\n");print $0}' | awk '{gsub(/\]  /,"\n");print $0}' > $1.vtt
-rm $1
-```
-
 Export final .mp4 with subtitles
 ```
 ffmpeg -i "$VIDEO_TO_SUB" -i "$PATH_TO_SUBS/translation.vtt" -c copy -c:s mov_text outfile.mp4
@@ -122,7 +130,7 @@ source timeformat.sh
 milliformat "2.3" #2 minutes 3 seconds
 stampformat "3.2.1" #3 hours 2 minutes 1 second
 ```
-#### Grammar-Spelling Checking - Language Tool
+#### Grammar-Spelling Checking Language-Tool
 Install full-version of Language Tool
 ```
 docker pull registry.gitlab.com/py_crash/docker-libregrammar
