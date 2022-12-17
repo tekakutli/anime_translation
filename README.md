@@ -19,7 +19,7 @@ PATH_TO_WHISPER="/home/$USER/code/whisper.cpp"
 PATH_TO_MODELS="/home/$USER/models"
 ```
 ## Workflow
-- I'm assuming you are using linux, and check Dependencies
+- I'm assuming you are using linux, and check [Dependencies](#Dependencies)
 - More information about each component best researched in their own websites
 - The main workflow is as follows: 
   - Setup the Model, Whisper here, and use it to translate directly from japanese audio to english text.
@@ -186,18 +186,24 @@ To use: (This one file, opus.sh, is better if you check it yourself to properly 
 t "text to translate"
 ```
 ### Get Event Timestamps
-Speech-timestamps: (first install [torch](https://pytorch.org/get-started/locally/))
+#### Scene-timestamps
+Visual Scene timestamps:
 ```
-python vad.py "$AUDIO_EXTRACT" > audio_timecodes.txt
-cat audio_timecodes.txt | awk '{gsub(/[:\47]/,"");print $0}' | awk '{gsub(/.{end /,"");print $0}' | awk '{gsub(/ start /,"");print $0}' | awk '{gsub(/}./,"");print $0}' | awk -F',' '{ print $2 "," $1}' | awk '{gsub(/,/,"\n");print $0}' | while read -r line; do date -d@$line -u '+%T.%2N'; done | paste -d " "  - - | sed 's/ / ---> /g' > audio_timestamps.txt
-```
-Scene-timestamps:
-```
+# Install
 pip install scenedetect[opencv] --upgrade
-
+# Use
 scenedetect -i "$VIDEO_TO_SUB" detect-adaptive list-scenes >> scenedetect_output.txt
 cat scenedetect_output.txt | grep \| | cut -d'|' -f4,6 | sed 's/|/--->/g' >> timestamps.txt
 tail -1 scenedetect_output.txt > timecodes.txt
+```
+#### VAD, Speech timestamps
+What is VAD? VAD means: Voice Activity Detector  
+It gives you the speech timestamps, when human voice is detected  
+first install [torch](https://pytorch.org/get-started/locally/), then:
+```
+# Use
+python vad.py "$AUDIO_EXTRACT" > audio_timecodes.txt
+cat audio_timecodes.txt | awk '{gsub(/[:\47]/,"");print $0}' | awk '{gsub(/.{end /,"");print $0}' | awk '{gsub(/ start /,"");print $0}' | awk '{gsub(/}./,"");print $0}' | awk -F',' '{ print $2 "," $1}' | awk '{gsub(/,/,"\n");print $0}' | while read -r line; do date -d@$line -u '+%T.%2N'; done | paste -d " "  - - | sed 's/ / ---> /g' > audio_timestamps.txt
 ```
 ### Translate the Speakers-Stream
 you need to Ctrl-C to stop recording, then it will translate the temporal recording
