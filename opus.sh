@@ -3,6 +3,25 @@
 
 OPUSMT=true
 LANG_TO=en
+
+# SHORTHAND CONVENIANCES FOR EASY LANG-PAIR SWITCHING, ADD YOURS
+tj(){
+     LANG_FROM=Japanese
+     LANG_TO=en
+}
+tme(){
+     LANG_FROM=Mandarin
+     LANG_TO=en
+}
+tem(){
+     LANG_FROM=en
+     LANG_TO=Mandarin
+}
+
+
+
+
+
 # ACTIVATES OPUS
 Opus-MT (){
      OPUSMT=false;
@@ -41,16 +60,3 @@ t(){
      # echo ""
 }
 
-# SHORTHAND CONVENIANCES FOR EASY LANG-PAIR SWITCHING, ADD YOURS
-tj(){
-     LANG_FROM=Japanese
-     LANG_TO=en
-}
-tme(){
-     LANG_FROM=Mandarin
-     LANG_TO=en
-}
-tem(){
-     LANG_FROM=en
-     LANG_TO=Mandarin
-}

@@ -9,14 +9,17 @@ PATH_TO_SUBS="anime_translation clone, this repo"
 PATH_TO_SUBED="emacs_subed clone"
 VIDEO_TO_SUB="path/video.mp4"
 AUDIO_EXTRACT="path/doesnt_exist_yet_audio.wav"
-
-# NEEDED ONLY IF: OPUS OR STREAMTRANSLATE
+LANG_FROM="the source language two letter ISO code"
 PATH_TO_OPUS="Opus-MT clone"
-LANG_FROM="ja"
 
 # EXAMPLE
 PATH_TO_WHISPER="/home/$USER/code/whisper.cpp"
-PATH_TO_MODELS="/home/$USER/models"
+PATH_TO_MODELS="/home/$USER/files/models"
+PATH_TO_SUBS="/home/$USER/code/anime_translation"
+PATH_TO_SUBED="/home/$USER/code/emacs/subed"
+VIDEO_TO_SUB="/home/$USER/Downloads/torrent/video.mp4"
+AUDIO_EXTRACT="/tmp/audio.wav"
+LANG_FROM="ja"
 ```
 ## Workflow
 - I'm assuming you are using linux, and check [Dependencies](#Dependencies)
@@ -49,16 +52,13 @@ PATH_TO_MODELS="/home/$USER/models"
 used model: WHISPER  
 download model *ggml-large.bin* from: https://huggingface.co/datasets/ggerganov/whisper.cpp
 ```
-git clone https://github.com/ggerganov/whisper.cpp
-cd whisper.cpp
-make
+make setup
 ```
 
 #### Model Usage
 get audio from video file for *whisper* to use
 ``` 
-ffmpeg -i "$VIDEO_TO_SUB" -ar 16000 -ac 1 -c:a pcm_s16le "$AUDIO_EXTRACT"
-$PATH_TO_WHISPER/main -m $PATH_TO_MODELS/ggml-large.bin -l ja -tr -f "$AUDIO_EXTRACT" -ovtt
+make use
 ``` 
 the -tr flag activates translation into english, without it transcribes into japanese
 ##### Warning
@@ -67,24 +67,19 @@ the -tr flag activates translation into english, without it transcribes into jap
   - then use the -ot *milliseconds* flag to resume at that point
 - After interrupting, copy from Terminal, then format appropriately with:
 ```
-formatToVtt(){
- cat $1 | awk '{gsub(/\[/,"\n");print $0}' | awk '{gsub(/\]  /,"\n");print $0}' > $1.vtt
-}
-formatToVtt terminaloutput.txt
+make formatToVtt
 ```
 ### MPV 
 get mpv to load some subs
 ``` 
-SUBS_FILE="$PATH_TO_SUBS/translation.vtt"
-mpv --sub-file="$SUBS_FILE" "$VIDEO_TO_SUB"
+make mpv
 ``` 
 
 what subs?  
 git clone https://github.com/tekakutli/anime_translation/
 
 ### VTT efficient creation or edit
-I use *subed*
-
+I use *subed*  
 git clone https://github.com/sachac/subed  
 and copy next snippet into emacs config.el  
 
@@ -112,36 +107,34 @@ This ffsubsync-script first autosyncs japanese captions with japanese audio, and
 The japanese captions only need to be phonetically close, which means that we can use a smaller-faster model to get them instead, *ggml-small.bin* in this case.  
 This is the reason behind the names, why some are called whisper_small vs whisper_large (the model used).
 ```
-pip install ffsubsync
-bash autosync.sh
+make installffsubsync
+make autosync
 ```
 ### Other Utils
 To .srt Conversion
-``` 
-ffmpeg -y -i file.vtt file.srt
+```
+source functions.sh
+vttToSrt subs.vtt
 ```
 Export final .mp4 with subtitles
 ```
-ffmpeg -i "$VIDEO_TO_SUB" -i "$PATH_TO_SUBS/translation.vtt" -c copy -c:s mov_text outfile.mp4
+make export
 ```
-To format a given time in milliseconds or as timestamps
+To format a given time in milliseconds or as timestamps, example:
 ```
-source timeformat.sh
+#timeformat.sh has these two commodity functions:
 milliformat "2.3" #2 minutes 3 seconds
 stampformat "3.2.1" #3 hours 2 minutes 1 second
 ```
 #### Grammar-Spelling Checking Language-Tool
 Install full-version of Language Tool
 ```
-docker pull registry.gitlab.com/py_crash/docker-libregrammar
+make installlanguagetool
 ```
 Activate it
 ```
-libregrammar (){
-     sudo systemctl start docker
-     sudo docker run -d --rm -it --name=libregrammar -p 8081:8081 registry.gitlab.com/py_crash/docker-libregrammar
-}
-libregrammar
+source functions.sh
+languagetool
 ```
 Emacs config.el
 ```
@@ -163,25 +156,15 @@ example, download: zho-eng eng-zho ja-en, to your PATH_TO_MODELS
 and renaming the downloaded directories to those short-hand names  
 and edit PATH_TO_SUBS/Opus-MT/services.json appropriately
 ```
-sudo mkdir -p /usr/src/app/
-sudo ln -s $PATH_TO_MODELS /usr/src/app/models
-
-cd $PATH_TO_OPUS
-git clone https://github.com/Helsinki-NLP/Opus-MT
-cd Opus-MT
-rm services.json docker-compose.yaml
-ln -s $PATH_TO_SUBS/Opus-MT/services.json .
-ln -s $PATH_TO_SUBS/Opus-MT/docker-compose.yaml .
-
-sudo docker-compose build
-sudo docker-compose up
+make installopus
 ```
 To activate:
 ```
+#opus.sh has commodity functions
 source opus.sh
 Opus-MT
 ```
-To use: (This one file, opus.sh, is better if you check it yourself to properly understand-edit it)
+To use: 
 ```
 t "text to translate"
 ```
@@ -189,26 +172,26 @@ t "text to translate"
 #### Scene-timestamps
 Visual Scene timestamps:
 ```
-# Install
-pip install scenedetect[opencv] --upgrade
-# Use
-scenedetect -i "$VIDEO_TO_SUB" detect-adaptive list-scenes >> scenedetect_output.txt
-cat scenedetect_output.txt | grep \| | cut -d'|' -f4,6 | sed 's/|/--->/g' >> timestamps.txt
-tail -1 scenedetect_output.txt > timecodes.txt
+make installSceneTimestamps
+make sceneTimestamps
 ```
 #### VAD, Speech timestamps
 What is VAD? VAD means: Voice Activity Detector  
 It gives you the speech timestamps, when human voice is detected  
 first install [torch](https://pytorch.org/get-started/locally/), then:
 ```
-# Use
-python vad.py "$AUDIO_EXTRACT" > audio_timecodes.txt
-cat audio_timecodes.txt | awk '{gsub(/[:\47]/,"");print $0}' | awk '{gsub(/.{end /,"");print $0}' | awk '{gsub(/ start /,"");print $0}' | awk '{gsub(/}./,"");print $0}' | awk -F',' '{ print $2 "," $1}' | awk '{gsub(/,/,"\n");print $0}' | while read -r line; do date -d@$line -u '+%T.%2N'; done | paste -d " "  - - | sed 's/ / ---> /g' > audio_timestamps.txt
+make speechTimestamps
 ```
 ### Translate the Speakers-Stream
 you need to Ctrl-C to stop recording, then it will translate the temporal recording
 ```
-bash streamtranslate.sh
+source functions.sh
+streamtranslate
+```
+if you were to have sway, you could put this in your sway config, and have an easy keybinding to translate what you are hearing
+
+```
+bindsym $mod+Shift+return exec alacritty -e bash /home/$USER/files/code/anime_translation/streamtranslate.sh
 ```
 ## Dependencies
 - Linux, Bash, Mpv, Ffmpeg, Emacs, Subed
