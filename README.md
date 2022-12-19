@@ -13,13 +13,22 @@ LANG_FROM="the source language 2-3 letter ISO code"
 PATH_TO_OPUS="Opus-MT clone"
 
 # EXAMPLE
-PATH_TO_WHISPER="/home/$USER/code/whisper.cpp"
 PATH_TO_MODELS="/home/$USER/files/models"
-PATH_TO_SUBS="/home/$USER/code/anime_translation"
-PATH_TO_SUBED="/home/$USER/code/emacs/subed"
 VIDEO_TO_SUB="/home/$USER/Downloads/torrent/video.mp4"
 AUDIO_EXTRACT="/tmp/audio.wav"
 LANG_FROM="ja"
+CLONES="/home/$USER/code" #MY OWN PATH TO CLONES
+PATH_TO_WHISPER="$CLONES/whisper.cpp"
+PATH_TO_SUBS="$CLONES/anime_translation"
+PATH_TO_SUBED="$CLONES/emacs/subed"
+PATH_TO_OPUS="$CLONES"
+```
+
+LOAD THE FUNCTIONS  
+```
+source snippets/functions.sh
+source snippets/opus.sh
+source snippets/timeformat.sh
 ```
 ## Workflow
 - I'm assuming you are using linux, and check [Dependencies](#Dependencies)
@@ -58,7 +67,7 @@ make setup
 #### Model Usage
 get audio from video file for *whisper* to use
 ``` 
-make use
+useWhisper
 ``` 
 the -tr flag activates translation into english, without it transcribes into japanese
 ##### Warning
@@ -67,12 +76,12 @@ the -tr flag activates translation into english, without it transcribes into jap
   - then use the -ot *milliseconds* flag to resume at that point
 - After interrupting, copy from Terminal, then format appropriately with:
 ```
-make formatToVtt
+formatToVtt
 ```
 ### MPV 
 get mpv to load some subs
 ``` 
-make mpv
+mpvLoadSubs
 ``` 
 what subs?  
 git clone https://github.com/tekakutli/anime_translation/
@@ -90,17 +99,16 @@ The japanese captions only need to be phonetically close, which means that we co
 This is the reason behind the names, why some are called whisper_small vs whisper_large (the model used).
 ```
 make installffsubsync
-make autosync
+autosync
 ```
 ### Other Utils
 To .srt Conversion
 ```
-source snippets/functions.sh
 vttToSrt subs.vtt
 ```
 Export final .mp4 with subtitles
 ```
-make export
+exportSubs
 ```
 To format a given time in milliseconds or as timestamps, example:
 ```
@@ -115,7 +123,6 @@ make installlanguagetool
 ```
 Activate it
 ```
-source snippets/functions.sh
 languagetool
 ```
 add LanguageTool section from configAdd.el to Emacs config.el  
@@ -136,7 +143,6 @@ make installopus
 To activate:
 ```
 #opus.sh has commodity functions
-source opus.sh
 Opus-MT
 ```
 To use: 
@@ -148,19 +154,19 @@ t "text to translate"
 Visual Scene timestamps:
 ```
 make installSceneTimestamps
-make sceneTimestamps
+
+sceneTimestamps
 ```
 #### VAD, Speech timestamps
 What is VAD? VAD means: Voice Activity Detector  
 It gives you the speech timestamps, when human voice is detected  
 first install [torch](https://pytorch.org/get-started/locally/), then:
 ```
-make speechTimestamps
+speechTimestamps
 ```
 ### Translate the Speakers-Stream
 you need to Ctrl-C to stop recording, then it will translate the temporal recording
 ```
-source functions.sh
 streamtranslate
 ```
 if you were to have sway, you could put this in your sway config, and have an easy keybinding to translate what you are hearing
