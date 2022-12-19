@@ -9,7 +9,7 @@ PATH_TO_SUBS="anime_translation clone, this repo"
 PATH_TO_SUBED="emacs_subed clone"
 VIDEO_TO_SUB="path/video.mp4"
 AUDIO_EXTRACT="path/doesnt_exist_yet_audio.wav"
-LANG_FROM="the source language two letter ISO code"
+LANG_FROM="the source language 2-3 letter ISO code"
 PATH_TO_OPUS="Opus-MT clone"
 
 # EXAMPLE
