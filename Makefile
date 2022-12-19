@@ -29,7 +29,7 @@ installffsubsync:
 	pip install ffsubsync
 
 autosync:
-	bash autosync.sh
+	bash snippets/autosync.sh
 
 installlanguagetool:
 	docker pull registry.gitlab.com/py_crash/docker-libregrammar
@@ -50,7 +50,7 @@ speechTimestamps:
 	bash snippets/speechTimestamps.sh
 
 speakersTranslate:
-	bash streamtranslate.sh
+	bash snippets/streamtranslate.sh
 
 export:
 	bash snippets/exportSubs.sh

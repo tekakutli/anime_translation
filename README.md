@@ -50,7 +50,7 @@ LANG_FROM="ja"
 ## Setup
 ### Model Setup
 used model: WHISPER  
-download model *ggml-large.bin* from: https://huggingface.co/datasets/ggerganov/whisper.cpp
+will download model *ggml-large.bin* from: [here](https://huggingface.co/datasets/ggerganov/whisper.cpp) 
 ```
 make setup
 ```
@@ -74,7 +74,6 @@ get mpv to load some subs
 ``` 
 make mpv
 ``` 
-
 what subs?  
 git clone https://github.com/tekakutli/anime_translation/
 
@@ -87,7 +86,7 @@ git clone https://gist.github.com/mooseyboots/d9a183795e5704d3f517878703407184
 add *Subed Extra Section* from *configAdd.el* to Emacs *config.el*  
 ### AutoSync the Subs
 This ffsubsync-script first autosyncs japanese captions with japanese audio, and then uses those timestamps to sync english captions to japanese captions.  
-The japanese captions only need to be phonetically close, which means that we can use a smaller-faster model to get them instead, *ggml-small.bin* in this case.  
+The japanese captions only need to be phonetically close, which means that we could use a smaller-faster model to get them instead, *ggml-small.bin*, [here](https://huggingface.co/datasets/ggerganov/whisper.cpp/tree/main).  
 This is the reason behind the names, why some are called whisper_small vs whisper_large (the model used).
 ```
 make installffsubsync
@@ -96,7 +95,7 @@ make autosync
 ### Other Utils
 To .srt Conversion
 ```
-source functions.sh
+source snippets/functions.sh
 vttToSrt subs.vtt
 ```
 Export final .mp4 with subtitles
@@ -116,7 +115,7 @@ make installlanguagetool
 ```
 Activate it
 ```
-source functions.sh
+source snippets/functions.sh
 languagetool
 ```
 add LanguageTool section from configAdd.el to Emacs config.el  
@@ -125,8 +124,8 @@ Emacs use:
 (langtool-check)
 ```
 #### Local Text Translation
-your FROM-TO model is either [here](https://github.com/Helsinki-NLP/Opus-MT-train/tree/master/models) or [here](https://github.com/Helsinki-NLP/Tatoeba-Challenge/tree/master/models)
-example get:
+your FROM-TO model is either [here](https://github.com/Helsinki-NLP/Opus-MT-train/tree/master/models) or [here](https://github.com/Helsinki-NLP/Tatoeba-Challenge/tree/master/models)  
+example, to get the models I use:
 ```
 make opusInstallExample
 ```
@@ -167,7 +166,7 @@ streamtranslate
 if you were to have sway, you could put this in your sway config, and have an easy keybinding to translate what you are hearing
 
 ```
-bindsym $mod+Shift+return exec alacritty -e bash /home/$USER/files/code/anime_translation/streamtranslate.sh
+bindsym $mod+Shift+return exec alacritty -e bash /home/$USER/files/code/anime_translation/snippets/streamtranslate.sh
 ```
 ## Dependencies
 - Linux, Bash, Mpv, Ffmpeg, Emacs, Subed
