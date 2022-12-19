@@ -81,27 +81,10 @@ git clone https://github.com/tekakutli/anime_translation/
 ### VTT efficient creation or edit
 I use *subed*  
 git clone https://github.com/sachac/subed  
-and copy next snippet into emacs config.el  
-
-``` 
-(add-to-list 'load-path "$PATH_TO_SUBED/subed/subed")
-(require 'subed-autoloads)
-
-(use-package! subed
-  :ensure t
-  :config
-  ;; Disable automatic movement of point by default
-  (add-hook 'subed-mode-hook 'subed-disable-sync-point-to-player)
-  ;; Remember cursor position between sessions
-  (add-hook 'subed-mode-hook 'save-place-local-mode)
-  ;; Break lines automatically while typing
-  (add-hook 'subed-mode-hook 'turn-on-auto-fill)
-   ;; Break lines at 40 characters
-  (add-hook 'subed-mode-hook (lambda () (setq-local fill-column 40))))
-```
-now you can use (subed-mpv-play-from-file) and automatically sync what mpv is showing with what you have in focus at the .vtt  
-you should also check out the functions at this [gist](https://gist.github.com/mooseyboots/d9a183795e5704d3f517878703407184) for more ease when moving around colliding timestamps
-
+add *Subed* from *configAdd.el* to Emacs *config.el*  
+alternatively, add this extra:  
+git clone https://gist.github.com/mooseyboots/d9a183795e5704d3f517878703407184  
+add *Subed Extra Section* from *configAdd.el* to Emacs *config.el*  
 ### AutoSync the Subs
 This ffsubsync-script first autosyncs japanese captions with japanese audio, and then uses those timestamps to sync english captions to japanese captions.  
 The japanese captions only need to be phonetically close, which means that we can use a smaller-faster model to get them instead, *ggml-small.bin* in this case.  
@@ -136,25 +119,18 @@ Activate it
 source functions.sh
 languagetool
 ```
-Emacs config.el
-```
-(setq langtool-http-server-host "localhost"
-      langtool-http-server-port 8081)
-;; (setq langtool-http-server-stream-type 'tls)
-(setq langtool-default-language "en-US")
-(require 'langtool)
-```
-Emacs use
+add LanguageTool section from configAdd.el to Emacs config.el  
+Emacs use:
 ```
 (langtool-check)
 ```
 #### Local Text Translation
-get your FROM-TO model from  
-https://github.com/Helsinki-NLP/Opus-MT-train/tree/master/models  
-https://github.com/Helsinki-NLP/Tatoeba-Challenge/tree/master/models  
-example, download: zho-eng eng-zho ja-en, to your PATH_TO_MODELS  
-and renaming the downloaded directories to those short-hand names  
-and edit PATH_TO_SUBS/Opus-MT/services.json appropriately
+your FROM-TO model is either [here](https://github.com/Helsinki-NLP/Opus-MT-train/tree/master/models) or [here](https://github.com/Helsinki-NLP/Tatoeba-Challenge/tree/master/models)
+example get:
+```
+make opusInstallExample
+```
+edit PATH_TO_SUBS/Opus-MT/services.json appropriately, then:
 ```
 make installopus
 ```

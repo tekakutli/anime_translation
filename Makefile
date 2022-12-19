@@ -37,6 +37,9 @@ installlanguagetool:
 installopus:
 	bash snippets/installOpus.sh
 
+opusInstallExample:
+	bash snippets/opusInstallExample.sh
+
 installSceneTimestamps:
 	pip install scenedetect[opencv] --upgrade
 
