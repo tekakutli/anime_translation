@@ -1,31 +1,10 @@
 # Anime Translation Initiative
 AI-helped transcription and translation  
 Everything works offline  
-```
-# SET YOUR PERSONAL ENVIROMENT VARIABLES (FILL APPROPRIATELY)
-PATH_TO_WHISPER="whisper.cpp clone"
-PATH_TO_MODELS="models folder, like for ggml-large.bin"
-PATH_TO_SUBS="anime_translation clone, this repo"
-PATH_TO_SUBED="emacs_subed clone"
-VIDEO_TO_SUB="path/video.mp4"
-AUDIO_EXTRACT="path/doesnt_exist_yet_audio.wav"
-LANG_FROM="the source language 2-3 letter ISO code"
-PATH_TO_OPUS="Opus-MT clone"
-
-# EXAMPLE
-PATH_TO_MODELS="/home/$USER/files/models"
-VIDEO_TO_SUB="/home/$USER/Downloads/torrent/video.mp4"
-AUDIO_EXTRACT="/tmp/audio.wav"
-LANG_FROM="ja"
-CLONES="/home/$USER/code" #MY OWN PATH TO CLONES
-PATH_TO_WHISPER="$CLONES/whisper.cpp"
-PATH_TO_SUBS="$CLONES/anime_translation"
-PATH_TO_SUBED="$CLONES/emacs/subed"
-PATH_TO_OPUS="$CLONES"
-```
 
 LOAD THE FUNCTIONS  
 ```
+source snippets/enviromentvariables.sh #YOU MUST EDIT THIS ONE
 source snippets/functions.sh
 source snippets/opus.sh
 source snippets/timeformat.sh
@@ -165,7 +144,7 @@ first install [torch](https://pytorch.org/get-started/locally/), then:
 speechTimestamps
 ```
 ### Translate the Speakers-Stream
-you need to Ctrl-C to stop recording, then it will translate the temporal recording
+you'll need to Ctrl-C to stop recording, after which it will translate the temporal recording
 ```
 streamtranslate
 ```

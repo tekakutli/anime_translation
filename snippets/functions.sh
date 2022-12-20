@@ -7,31 +7,36 @@ languagetool (){
 vttToSrt (){
     ffmpeg -y -i file.vtt file.srt
 }
-
-
-streamTranslate (){
-    bash streamtranslate.sh
+getAudio(){
+    ffmpeg -i "$VIDEO_TO_SUB" -ar 16000 -ac 1 -c:a pcm_s16le "$AUDIO_EXTRACT"
 }
 
+PATH_TO_SNIPPETS=${PATH_TO_SUBS}/snippets/
+streamTranslate (){
+    bash ${PATH_TO_SNIPPETS}streamtranslate.sh
+}
 sceneTimestamps (){
-    bash sceneTimestamps.sh
+    bash ${PATH_TO_SNIPPETS}sceneTimestamps.sh
 }
 speechTimestamps (){
+    CURRENTDIR=$(pwd)
+    cd $PATH_TO_SNIPPETS
     bash speechTimestamps.sh
+    cd $CURRENTDIR
 }
 useWhisper (){
-    bash modelToText.sh
+    bash ${PATH_TO_SNIPPETS}modelToText.sh
 }
 formatToVtt (){
-    bash formatToVtt.sh $1
+    bash ${PATH_TO_SNIPPETS}formatToVtt.sh $1
 }
 mpvLoadSubs (){
-    bash mpvLoadSubs.sh
+    bash ${PATH_TO_SNIPPETS}mpvLoadSubs.sh
 }
 exportSubs (){
-    bash exportSubs.sh
+    bash ${PATH_TO_SNIPPETS}exportSubs.sh
 }
 autosync (){
-    bash autosync.sh
+    bash ${PATH_TO_SNIPPETS}autosync.sh
 }
 
