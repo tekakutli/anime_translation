@@ -2,7 +2,8 @@
 whisper.cpp/
 
 # Don't include audio or video files
-*.mp4, *.mov
+*.mp4
+*.mov
 *.wav
 
 # Generated temporary working directories
