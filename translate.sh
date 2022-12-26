@@ -214,7 +214,7 @@ main() {
 
     # Create a directory for us to work in if none was specified.
     if [[ -z $temp_dir ]]; then
-        temp_dir=`mktemp -d "$(basename $input_file).XXXX"`
+        temp_dir=`mktemp -d "tmp_$(basename $input_file).XXXX"`
     fi
 
     # Extract audio from video file for processing with whisper
