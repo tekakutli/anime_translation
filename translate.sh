@@ -110,16 +110,21 @@ $0: Automatically add subtitles to anime from raw video.
 Usage: $0 [ options ] input_file
 
 Options:
-    -h           Show this help and exit
-    -o outfile   Write output video to outfile
-    -s value     Synchronise subtitles using the provided model, or don't synchronise if value is off.
-                   (off, tiny, base, small (default), medium, large)
-    -m value     Specify the model to use when extracting subtitles from the raw audio.
-                   (tiny, base, small, medium, large (default))
-    -t dir       Generate intermediary files in dir and do not delete dir once work is done
-    -w dir       Specify the location of the whisper.cpp clone to use.
-    -p num       Specify the number of processors to use (splits audio into separate chunks processed in parallel, default 1).
-    -t num       Specify the number of threads to use on each processor (default 4).
+    -h          Show this help and exit.
+    -o outfile  Write output video to outfile.
+    -s value    Synchronise subtitles using the provided model, or don't
+                synchronise if value is off.
+                  (off, tiny, base, small (default), medium, large)
+    -m value    Specify the model to use when extracting subtitles from the
+                raw audio.
+                  (tiny, base, small, medium, large (default))
+    -t dir      Generate intermediary files in dir and do not delete dir once
+                work is done.
+    -w dir      Specify the location of the whisper.cpp clone to use.
+    -p num      Specify the number of processors to use (splits audio into
+                separate chunks processed in parallel, default 1).
+    -t num      Specify the number of threads to use on each processor
+                (default 4).
 EOF
 }
 
