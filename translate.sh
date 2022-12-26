@@ -80,8 +80,8 @@ synchronise_subtitles() {
     ffmpeg -y -loglevel quiet -i "$input_us_translated" "$input_us_translated.srt"
 
     # Synchronise subtitles with ffsubsync
-    ffsubsync "$input_video" --max-offset-seconds .1 --gss -i "$input_us_native.srt" -o "$output_native"
-    ffsubsync "$output_native" --max-offset-seconds .1 -i "$input_us_translated.srt" -o "$output_translated.srt"
+    ffsubsync "$input_video" --max-offset-seconds .1 --gss -i "$input_us_native.srt" -o "$output_native.srt"
+    ffsubsync "$output_native.srt" --max-offset-seconds .1 -i "$input_us_translated.srt" -o "$output_translated.srt"
 
     # Convert result back to VTT
     ffmpeg -y -loglevel quiet -i "$output_translated.srt" "$output_translated"
