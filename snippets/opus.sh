@@ -23,7 +23,7 @@ tem() {
 # ACTIVATES OPUS
 Opus-MT() {
      OPUSMT=false
-     pushd "$PATH_TO_OPUS/Opus-MT"
+     pushd "$PATH_TO_OPUS"
      sudo docker-compose up -d
      popd
 }

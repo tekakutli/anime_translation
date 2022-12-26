@@ -1,31 +1,38 @@
 #!/usr/bin/env sh
 
 # SET YOUR PERSONAL ENVIROMENT VARIABLES (FILL APPROPRIATELY)
-# export PATH_TO_WHISPER="whisper.cpp clone"
-# export PATH_TO_MODELS="models folder, like for ggml-large.bin"
-# export PATH_TO_SUBS="anime_translation clone, this repo"
-# export PATH_TO_SUBED="emacs_subed clone"
-# export VIDEO_TO_SUB="path/video.mp4"
-# export LANG_FROM="the source language 2-3 letter ISO code"
-# export PATH_TO_OPUS="Opus-MT clone"
-# export OUTPUTS="future output, like vad"
-# export AUDIO_EXTRACT="path/doesnt_exist_yet_audio.wav"
-# mkdir -p $OUTPUTS
+# - PATH_TO_WHISPER: whisper.cpp clone
+# - PATH_TO_MODELS: path to folder containing ggml models to use with whisper
+# - PATH_TO_SUBS: path to this repository
+# 
+# - INPUT_VIDEO: path to the video to process
+# - LANG_FROM: language to translate from
+# - OUTPUT: output directory for generated files
+# - AUDIO_EXTRACT: path of the extracted audio
+# - VTT_PREFIX: prefix for generated subtitle files
+# - VTT_JAPANESE and VTT_ENGLISH: names of generated japanese & english VTT files
+#
+# - PATH_TO_OPUS: path to Opus-MT clone
+#
+# - PATH_TO_SUBED: path to subed clone
 
-export PATH_TO_MODELS="/home/$USER/files/models"
-export VIDEO_TO_SUB="/home/$USER/Downloads/torrent/video.mp4"
-export LANG_FROM="ja"
-export CLONES="/home/$USER/code" #MY OWN PATH TO CLONES
-export PATH_TO_WHISPER="$CLONES/whisper.cpp"
-export PATH_TO_SUBS="$CLONES/anime_translation"
-export PATH_TO_SUBED="$CLONES/emacs/subed"
-export PATH_TO_OPUS="$CLONES"
-export OUTPUTS="/tmp/outputs/"
-export AUDIO_EXTRACT="${OUTPUTS}audio.wav"
-mkdir -p "$OUTPUTS"
+export PATH_TO_WHISPER=
+export PATH_TO_MODELS="${PATH_TO_WHISPER}/models"
+export PATH_TO_SUBS=
 
+# Input/output
+export INPUT_VIDEO=
+export LANG_FROM=ja # Change if INPUT_VIDEO is not in Japanese
+export OUTPUT=
+export AUDIO_EXTRACT="$OUTPUT/audio.wav"
+export VTT_PREFIX="${input_file%.*}"
+export VTT_JAPANESE="${VTT_PREFIX}_japanese.vtt"
+export VTT_ENGLISH="${VTT_PREFIX}_english.vtt"
 
-export VTTPREFIX="isekai_ojisan_11"
-# THESE VTTS ARE THOSE YOU ALREADY MADE, AND WORKING UPON
-export VTTJAPANESE="${OUTPUTS}isekai_ojisan_11_whisper_small_japanese.vtt"
-export VTTENGLISH="${OUTPUTS}isekai_ojisan_11_whisper_large_english.vtt"
+mkdir -p "$OUTPUT" # Ensure output folder exists
+
+# If using Opus-MT
+export PATH_TO_OPUS=
+
+# If using emacs + subed
+export PATH_TO_SUBED=

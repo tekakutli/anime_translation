@@ -5,8 +5,8 @@ pushd /tmp
 LIVE_RECORD="/tmp/recording.flac"
 WAV_RECORD="/tmp/recording.wav"
 
-pw-record $LIVE_RECORD
-ffmpeg -y -i "$LIVE_RECORD" -ar 16000 -ac 1 -c:a pcm_s16le $WAV_RECORD
+pw-record "$LIVE_RECORD"
+ffmpeg -y -i "$LIVE_RECORD" -ar 16000 -ac 1 -c:a pcm_s16le "$WAV_RECORD"
 
 LANG_FROM="en"
 

@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 
-SUBS_FILE="${PATH_TO_SUBS}/${VTTPREFIX}_translation.vtt"
-mpv --sub-file="$SUBS_FILE" "$VIDEO_TO_SUB"
+subs_file="$OUTPUT/${VTTPREFIX}_translation.vtt"
+mpv --sub-file="$subs_file" "$VIDEO_TO_SUB"
