@@ -19,7 +19,7 @@ Options:
     -h           Show this help and exit
     -o outfile   Write output video to outfile
     -s value     Synchronise subtitles using the provided model, or don't synchronise if value is off.
-                   (off, tiny, base (default), small, medium, large)
+                   (off, tiny, base, small (default), medium, large)
     -m value     Specify the model to use when extracting subtitles from the raw audio.
                    (tiny, base, small, medium, large (default))
     -t dir       Generate intermediary files in dir and do not delete dir once work is done
