@@ -7,3 +7,5 @@ whisper.cpp/
 
 # Generated temporary working directories
 tmp_*
+
+.DS_Store
