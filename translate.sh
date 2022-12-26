@@ -10,7 +10,7 @@ set -eu
 # Creates a file at "$OUTPUT_AUDIO_FILE" with the audio content of "$INPUT_VIDEO_FILE" in WAV format.
 extract_audio() {
     echo "Extracting audio from $1..."
-    ffmpeg -y -loglevel quiet -i "$1" -ar 16000 -c:a pcm_s16le "$2"
+    ffmpeg -y -loglevel warning -i "$1" -ar 16000 -c:a pcm_s16le "$2"
 }
 
 # Using whisper, generate english subtitles translated from japanese audio.
@@ -82,15 +82,15 @@ synchronise_subtitles() {
     echo "Synchronising subtitles $input_us_translated to video $input_video"
     
     # Convert VTT inputs to SRT for ffsubsync to work with them
-    ffmpeg -y -loglevel quiet -i "$input_us_native" "$input_us_native.srt"
-    ffmpeg -y -loglevel quiet -i "$input_us_translated" "$input_us_translated.srt"
+    ffmpeg -y -loglevel warning -i "$input_us_native" "$input_us_native.srt"
+    ffmpeg -y -loglevel warning -i "$input_us_translated" "$input_us_translated.srt"
 
     # Synchronise subtitles with ffsubsync
     ffsubsync "$input_video" --max-offset-seconds .1 --gss -i "$input_us_native.srt" -o "$output_native.srt"
     ffsubsync "$output_native.srt" --max-offset-seconds .1 -i "$input_us_translated.srt" -o "$output_translated.srt"
 
     # Convert result back to VTT
-    ffmpeg -y -loglevel quiet -i "$output_translated.srt" "$output_translated"
+    ffmpeg -y -loglevel warning -i "$output_translated.srt" "$output_translated"
 }
 
 # Overlay subtitles onto an existing video file.
@@ -99,7 +99,7 @@ synchronise_subtitles() {
 #   overlay_subtitles "$INPUT_VIDEO_FILE" "$INPUT_SUBTITLES_FILE" "$OUTPUT_VIDEO_FILE"
 overlay_subtitles() {
     echo "Overlaying subtitles $2 onto video $1..."
-    ffmpeg -y -loglevel quiet -i "$1" -i "$2" -c copy -c:s mov_text "$3"
+    ffmpeg -y -loglevel warning -i "$1" -i "$2" -c copy -c:s mov_text "$3"
 }
 
 # Display a help message for this program.
