@@ -134,7 +134,7 @@ EOF
 #   download_model "$WHISPER_CPP" "$MODEL"
 download_model() {
     echo "Downloading model $2..."
-    bash "$1/models/download-ggml-model.sh" $2
+    bash "$1/models/download-ggml-model.sh" "$2"
 }
 
 # Ensure whisper.cpp is installed and ready.
@@ -178,7 +178,7 @@ main() {
     synchronization=small
     temp_dir=
     delete_temp_dir=0
-    whisper_cpp="$(dirname "$(realpath $0)")/whisper.cpp"
+    whisper_cpp="$(dirname "$(realpath "$0")")/whisper.cpp"
     processors=1
     threads=4
 
@@ -231,7 +231,7 @@ main() {
 
     # Create a directory for us to work in if none was specified.
     if [[ -z $temp_dir ]]; then
-        temp_dir=`mktemp -d "tmp_$(basename $input_file).XXXX"`
+        temp_dir=$(mktemp -d "tmp_$(basename "$input_file").XXXX")
     fi
 
     # Extract audio from video file for processing with whisper
@@ -271,7 +271,7 @@ main() {
     overlay_subtitles "$input_file" "$subtitles" "$output_file"
 
     if [[ $delete_temp_dir ]]; then
-        rm -r $temp_dir
+        rm -r "$temp_dir"
     fi
 }
 
