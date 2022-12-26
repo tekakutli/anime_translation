@@ -70,7 +70,7 @@ synchronise_subtitles() {
     input_video="$1"
     input_us_native="$2"
     input_us_translated="$3"
-    output_native = "$4"
+    output_native="$4"
     output_translated="$5"
 
     echo "Synchronising subtitles $input_us_translated to video $input_video"
@@ -141,7 +141,8 @@ ensure_whisper_cpp() {
     else
         echo "Checking for whisper.cpp updates..."
 
-        git fetch
+        # Don't fail if offline
+        git fetch || return 0
         if [[ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]]; then
             echo "Updating whisper.cpp..."
             git pull
@@ -168,7 +169,7 @@ main() {
 
     script_args=()
     while [[ $OPTIND -le "$#" ]]; do
-        if getopts "o:s:t:m:h" option; then
+        if getopts "o:s:t:m:w:h" option; then
             case $option in
                 o) output_file="$OPTARG";;
                 s) synchronization="$OPTARG";;
