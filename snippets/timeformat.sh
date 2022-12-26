@@ -1,22 +1,23 @@
 #!/usr/bin/env sh
 
-stampformat(){
+stampformat() {
     PROPERTIME=$(getseconds $1)
     date -d@$PROPERTIME -u '+%H:%M:%S.%2N'
 }
 
-milliformat(){
+milliformat() {
     PROPERTIME=$(getseconds $1)
     # From seconds to milliseconds
     PROPERTIME=$(echo "$PROPERTIME * 1000" | bc)
     echo $PROPERTIME
 }
-getseconds(){
+
+getseconds() {
      PROPERTIME=$(echo $(removeformat $1) | awk -F: '{ print ($1 * 3600) + ($2 * 60) + $3 }')
      echo $PROPERTIME
 }
 
-removeformat(){
+removeformat() {
      WITHOUTDOT=$(echo $1 | sed 's/\./:/g')
      res="${1//[^.]}"
      DOTCOUNT=$(echo "${#res}")

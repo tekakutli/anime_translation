@@ -5,37 +5,35 @@ OPUSMT=true
 LANG_TO=en
 
 # SHORTHAND CONVENIANCES FOR EASY LANG-PAIR SWITCHING, ADD YOURS
-tj(){
+tj() {
      LANG_FROM=Japanese
      LANG_TO=en
 }
-tme(){
+
+tme() {
      LANG_FROM=Mandarin
      LANG_TO=en
 }
-tem(){
+
+tem() {
      LANG_FROM=en
      LANG_TO=Mandarin
 }
 
-
-
-
-
 # ACTIVATES OPUS
-Opus-MT (){
-     OPUSMT=false;
-     sudo systemctl start docker
-     CURRENTDIR=$(pwd)
-     cd $PATH_TO_OPUS/Opus-MT
+Opus-MT() {
+     OPUSMT=false
+     pushd "$PATH_TO_OPUS/Opus-MT"
      sudo docker-compose up -d
-     cd $CURRENTDIR
+     popd
 }
-translationApiCall(){
+
+translationApiCall() {
      curl -s -X POST -H "Content-Type: application/json" -d "{\"source\":\"$1\",\"from\":\"$LANG_FROM\",\"to\":\"$LANG_TO\"}" "localhost:8888/api/translate" | jq -r '.translation'
 }
+
 # White Space Breaks Japanese-Chinese Translation
-translationApiCallWhiteSpaceFix (){
+translationApiCallWhiteSpaceFix() {
      TR=""
      IFS=' ' read -ra ADDR <<< "$1"
      for i in "${ADDR[@]}"; do
@@ -45,18 +43,19 @@ translationApiCallWhiteSpaceFix (){
      echo $TR
 }
 # THE MAIN METHOD
-t(){
+t() {
      if $OPUSMT; then
-           Opus-MT;
-           OPUSMT=false;
+           Opus-MT
+           OPUSMT=false
      fi
+
      if [[ "$LANG_FROM" == "en" ]]; then
           TRANSLATION=$(translationApiCall "$1")
      else
           TRANSLATION=$(translationApiCallWhiteSpaceFix "$1")
      fi
+     
      echo $TRANSLATION
-     wl-copy $TRANSLATION
-     # echo ""
+     wl-copy "$TRANSLATION"
 }
 

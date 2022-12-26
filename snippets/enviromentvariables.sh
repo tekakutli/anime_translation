@@ -22,7 +22,7 @@ export PATH_TO_SUBED="$CLONES/emacs/subed"
 export PATH_TO_OPUS="$CLONES"
 export OUTPUTS="/tmp/outputs/"
 export AUDIO_EXTRACT="${OUTPUTS}audio.wav"
-mkdir -p $OUTPUTS
+mkdir -p "$OUTPUTS"
 
 
 export VTTPREFIX="isekai_ojisan_11"
