@@ -18,21 +18,24 @@ extract_audio() {
 # Usage:
 #   generate_english_subtitles \
 #     "$WHISPER_CPP" \
+#     "$N_PROCESSORS" \
+#     "$N_THREADS" \
 #     "$MODEL" \
 #     "$INPUT_AUDIO_FILE" \
 #     "$OUTPUT_SUBTITLE_FILE"
 #
 # Creates a file at "$OUTPUT_SUBTITLE_FILE" with subtitles representing the audio in "$INPUT_AUDIO_FILE" in VTT format.
 generate_english_subtitles() {
-    echo "Generating english subtitles from $3 using model $2"
+    echo "Generating english subtitles from $5 using model $4"
 
     "$1/main" \
         -ovtt -l ja -tr \
-        -m "$1/models/ggml-$2.bin" \
-        -f "$3"
+        -p "$2" -t "$3" \
+        -m "$1/models/ggml-$4.bin" \
+        -f "$5"
 
     # Whisper.cpp doesn't have an output file option, move it ourselves
-    mv "$3.vtt" "$4"
+    mv "$5.vtt" "$6"
 }
 
 # Using whisper, generate japanese subtitles transcribed from japanese audio.
@@ -40,21 +43,24 @@ generate_english_subtitles() {
 # Usage:
 #   generate_japanese_subtitles \
 #     "$WHISPER_CPP" \
-#     "$MODEL"
+#     "$N_PROCESSORS" \
+#     "$N_THREADS" \
+#     "$MODEL" \
 #     "$INPUT_AUDIO_FILE" \
 #     "$OUTPUT_SUBTITLE_FILE"
 #
 # Creates a file at "$OUTPUT_SUBTITLE_FILE" with subtitles representing the audio in "$INPUT_AUDIO_FILE" in VTT format.
 generate_japanese_subtitles() {
-    echo "Generating japanese subtitles from $3 using model $2..."
+    echo "Generating japanese subtitles from $5 using model $4..."
 
     "$1/main" \
         -ovtt -l ja -su \
-        -m "$1/models/ggml-$2.bin" \
-        -f "$3"
+        -p "$2" -t "$3" \
+        -m "$1/models/ggml-$4.bin" \
+        -f "$5"
 
     # Whisper.cpp doesn't have an output file option, move it ourselves
-    mv "$3.vtt" "$4"
+    mv "$5.vtt" "$6"
 }
 
 # Using ffsubsync, synchronise subtitles to a video.
@@ -112,6 +118,8 @@ Options:
                    (tiny, base, small, medium, large (default))
     -t dir       Generate intermediary files in dir and do not delete dir once work is done
     -w dir       Specify the location of the whisper.cpp clone to use.
+    -p num       Specify the number of processors to use (splits audio into separate chunks processed in parallel, default 1).
+    -t num       Specify the number of threads to use on each processor (default 4).
 EOF
 }
 
@@ -166,10 +174,12 @@ main() {
     temp_dir=
     delete_temp_dir=0
     whisper_cpp="$(dirname "$(realpath $0)")/whisper.cpp"
+    processors=1
+    threads=4
 
     script_args=()
     while [[ $OPTIND -le "$#" ]]; do
-        if getopts "o:s:t:m:w:h" option; then
+        if getopts "o:s:t:m:w:p:t:h" option; then
             case $option in
                 o) output_file="$OPTARG";;
                 s) synchronization="$OPTARG";;
@@ -179,6 +189,8 @@ main() {
                     ;;
                 m) model="$OPTARG";;
                 w) whisper_cpp="$OPTARG";;
+                p) processors="$OPTARG";;
+                t) threads="$OPTARG";;
                 h | *)
                     show_help
                     exit 0
@@ -222,12 +234,20 @@ main() {
 
     # Generate unsynchronised english subtitles
     subtitles="$temp_dir/unsynchronised_english.vtt"
-    generate_english_subtitles "$whisper_cpp" "$model" "$temp_dir/audio.wav" "$subtitles"
+    generate_english_subtitles \
+        "$whisper_cpp" \
+        "$processors" \
+        "$threads" \
+        "$model" \
+        "$temp_dir/audio.wav" \
+        "$subtitles"
 
     if [[ "$synchronization" != "off" ]]; then
         # Generate unsynchronised japanese subtitles
         generate_japanese_subtitles \
             "$whisper_cpp" \
+            "$processors" \
+            "$threads" \
             "$synchronization" \
             "$temp_dir/audio.wav" \
             "$temp_dir/unsynchronised_japanese.vtt"
