@@ -118,7 +118,7 @@ Options:
     -m value    Specify the model to use when extracting subtitles from the
                 raw audio.
                   (tiny, base, small, medium, large (default))
-    -t dir      Generate intermediary files in dir and do not delete dir once
+    -d dir      Generate intermediary files in dir and do not delete dir once
                 work is done.
     -w dir      Specify the location of the whisper.cpp clone to use.
     -p num      Specify the number of processors to use (splits audio into
@@ -156,14 +156,14 @@ ensure_whisper_cpp() {
 
         # Don't fail if offline
         git fetch || return 0
-        if [[ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]]; then
+        if [[ "$(git rev-parse HEAD)" != "$(git rev-parse @\{u\})" ]]; then
             echo "Updating whisper.cpp..."
             git pull
             needs_compile=0
         fi
     fi
 
-    if [[ needs_compile || (! -x "$1/main") ]]; then
+    if [[ $needs_compile || (! -x "$1/main") ]]; then
         echo "Compiling whisper.cpp..."
         make
     fi
@@ -184,11 +184,11 @@ main() {
 
     script_args=()
     while [[ $OPTIND -le "$#" ]]; do
-        if getopts "o:s:t:m:w:p:t:h" option; then
+        if getopts "o:s:d:m:w:p:t:h" option; then
             case $option in
                 o) output_file="$OPTARG";;
                 s) synchronization="$OPTARG";;
-                t)
+                d)
                     temp_dir="$OPTARG"
                     delete_temp_dir=1
                     ;;
