@@ -136,7 +136,7 @@ ensure_whisper_cpp() {
 
     if [[ -z "$(ls -A .)" ]]; then
         echo "Downloading whisper.cpp..."
-        git clone "git@github.com:ggerganov/whisper.cpp.git" .
+        git clone "https://github.com/ggerganov/whisper.cpp.git" .
         needs_compile=0
     else
         echo "Checking for whisper.cpp updates..."
