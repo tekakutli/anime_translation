@@ -24,9 +24,11 @@ Options:
     -m value    Specify the model to use when extracting subtitles from the
                 raw audio.
                   (tiny, base, small, medium, large (default))
-    -t dir      Generate intermediary files in dir and do not delete dir once
+    -d dir      Generate intermediary files in dir and do not delete dir once
                 work is done.
-    -w dir      Specify the location of the whisper.cpp clone to use.
+    -w dir      Specify the location of the whisper.cpp clone to use. If
+                provided, automatic download/update and compilation is
+                disabled.
     -p num      Specify the number of processors to use (splits audio into
                 separate chunks processed in parallel, default 1).
     -t num      Specify the number of threads to use on each processor

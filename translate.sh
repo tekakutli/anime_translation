@@ -120,7 +120,9 @@ Options:
                   (tiny, base, small, medium, large (default))
     -d dir      Generate intermediary files in dir and do not delete dir once
                 work is done.
-    -w dir      Specify the location of the whisper.cpp clone to use.
+    -w dir      Specify the location of the whisper.cpp clone to use. If
+                provided, automatic download/update and compilation is
+                disabled.
     -p num      Specify the number of processors to use (splits audio into
                 separate chunks processed in parallel, default 1).
     -t num      Specify the number of threads to use on each processor
@@ -177,8 +179,9 @@ main() {
     model=large
     synchronization=small
     temp_dir=
-    delete_temp_dir=0
+    delete_temp_dir=true
     whisper_cpp="$(dirname "$(realpath "$0")")/whisper.cpp"
+    whisper_managed=true
     processors=1
     threads=4
 
@@ -190,10 +193,13 @@ main() {
                 s) synchronization="$OPTARG";;
                 d)
                     temp_dir="$OPTARG"
-                    delete_temp_dir=1
+                    delete_temp_dir=false
                     ;;
                 m) model="$OPTARG";;
-                w) whisper_cpp="$OPTARG";;
+                w)
+                    whisper_cpp="$OPTARG"
+                    whisper_managed=false
+                    ;;
                 p) processors="$OPTARG";;
                 t) threads="$OPTARG";;
                 h | *)
@@ -223,7 +229,10 @@ main() {
     echo "Output will be written to: $output_file"
 
     # Download & compile whisper.cpp and required models if needed
-    ensure_whisper_cpp "$whisper_cpp"
+    if [[ "$whisper_managed" == "true" ]]; then
+        ensure_whisper_cpp "$whisper_cpp"
+    fi
+    
     download_model "$whisper_cpp" "$model"
     if [[ "$synchronization" != "off" ]]; then
         download_model "$whisper_cpp" "$synchronization"
@@ -270,7 +279,7 @@ main() {
     # Overlay subtitles
     overlay_subtitles "$input_file" "$subtitles" "$output_file"
 
-    if [[ $delete_temp_dir ]]; then
+    if [[ "$delete_temp_dir" == "true" ]]; then
         rm -r "$temp_dir"
     fi
 }
