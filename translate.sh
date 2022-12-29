@@ -54,7 +54,7 @@ generate_japanese_subtitles() {
     echo "Generating japanese subtitles from $5 using model $4..."
 
     "$1/main" \
-        -ovtt -l ja -su \
+        -ovtt -l ja \
         -p "$2" -t "$3" \
         -m "$1/models/ggml-$4.bin" \
         -f "$5"
