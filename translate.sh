@@ -147,7 +147,7 @@ ensure_whisper_cpp() {
     needs_compile=1
 
     mkdir -p "$1"
-    pushd "$1"
+    pushd "$1" >/dev/null
 
     if [[ -z "$(ls -A .)" ]]; then
         echo "Downloading whisper.cpp..."
@@ -170,7 +170,7 @@ ensure_whisper_cpp() {
         make
     fi
 
-    popd
+    popd >/dev/null
 }
 
 main() {
