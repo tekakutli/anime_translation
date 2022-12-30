@@ -97,6 +97,7 @@ $ whisper.cpp/main \
     -l ja \
     -tr \
     -ovtt \
+    -mc 10 \
     -f input_audio.wav
 $ mv input_audio.wav.vtt english.vtt
 ```
@@ -104,7 +105,7 @@ Where `<model>` is the model you downloaded earlier to extract subtitles.
 
 This step can take a while depending on your hardware and chosen model. Setting `--threads n` and `--processors n` to match your PC's specs can help a lot.
 
-Whisper can break with music segments, and sometimes starts repeating its output. If that happens, interrupt the process and copy the output in the terminal. You can then format it using the `formatToVtt <file>` helper, which converts the whisper.cpp terminal output in `<file>` to VTT format in `<file>.vtt`. You can then manually merge all the converted segments later.
+Without the `-mc 10` option, whisper can break with music segments, and sometimes starts repeating its output. If that happens, interrupt the process and copy the output in the terminal. You can then format it using the `formatToVtt <file>` helper, which converts the whisper.cpp terminal output in `<file>` to VTT format in `<file>.vtt`. You can then manually merge all the converted segments later.
 
 Once you've converted the terminal output, resume whisper with the `-ot <millis>` flag at the point it left off.
 
@@ -116,7 +117,7 @@ First, generate a japanese transcription of the video for ffsubsync to use:
 $ whisper.cpp/main \
     -m whisper.cpp/models/ggml-<model>.bin \
     -l ja \
-    -su \
+    -mc 10 \
     -ovtt \
     -f input_audio.wav
 $ mv input_audio.wav.vtt japanese.vtt
