@@ -29,7 +29,7 @@ generate_english_subtitles() {
     echo "Generating english subtitles from $5 using model $4"
 
     "$1/main" \
-        -ovtt -l ja -tr \
+        -ovtt -l ja -tr -mc 10 \
         -p "$2" -t "$3" \
         -m "$1/models/ggml-$4.bin" \
         -f "$5"
@@ -54,7 +54,7 @@ generate_japanese_subtitles() {
     echo "Generating japanese subtitles from $5 using model $4..."
 
     "$1/main" \
-        -ovtt -l ja \
+        -ovtt -l ja -mc 10 \
         -p "$2" -t "$3" \
         -m "$1/models/ggml-$4.bin" \
         -f "$5"
