@@ -135,8 +135,10 @@ EOF
 # Usage:
 #   download_model "$WHISPER_CPP" "$MODEL"
 download_model() {
-    echo "Downloading model $2..."
-    bash "$1/models/download-ggml-model.sh" "$2"
+    if [[ ! -f "$1/models/ggml-$2.bin" ]]; then
+        echo "Downloading model $2..."
+        bash "$1/models/download-ggml-model.sh" "$2"
+    fi
 }
 
 # Ensure whisper.cpp is installed and ready.
