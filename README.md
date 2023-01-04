@@ -1,167 +1,246 @@
 # Anime Translation Initiative
-AI-helped transcription and translation  
-Everything works offline  
+AI-helped transcription and translation, fully offline.
 
-LOAD THE FUNCTIONS  
+## Quick start
+Ensure you have the dependencies installed:
+- `ffmpeg`, for extracting audio from & overlaying subtitles onto video.
+- `ffsubsync`, for synchronising subtitles to video. Can be skipped with `-s off`, and installed with `pip install ffsubsync`.
+- `git`, `make`, a C compiler and a C++ compiler, for downloading and compiling whisper.cpp.
+- `wget` or `curl`, for downloading the models to be used with whisper.cpp.
+
+Then, use the provided `translate.sh` script:
 ```
-source snippets/enviromentvariables.sh #YOU MUST EDIT THIS ONE
-source snippets/functions.sh
-source snippets/opus.sh
-source snippets/timeformat.sh
-```
-## Workflow
-- I'm assuming you are using linux, and check [Dependencies](#Dependencies)
-- More information about each component best researched in their own websites
-- The main workflow is as follows: 
-  - Setup the Model, Whisper here, and use it to translate directly from japanese audio to english text.
-    - To get the audio, formated appropriately, you use ffmpeg.
-    - [Instructions Here](#Model-Usage)
-  - The timestamps often aren't completely aligned with the sound, so we can use an AutoSync: ffsubsync.
-    - [Instructions Here](#AutoSync-the-Subs)
-  - Next comes the human to fix the translation, split long captions, further align them, etc.
-    - I propose the usage of Subed, which is an Emacs package
-      - Subed allows us to:
-        - Watch where are captioning in MPV
-        - Efficiently move, merge, split the timestamps, with precision.
-      - [Instructions Here](#VTT-efficient-creation-or-edit)
-  - Then, to fix grammar or spelling mistakes, we can use the Language-Tool
-    - [Instructions Here](#Grammar-Spelling-Checking-Language-Tool)
-  - Finally, we can load the .vtt file with mpv and enjoy, [Instructions Here](#MPV)
-- Some extra tools at your disposal:
-  - The Opus Model is a text-to-text translator model, like Google-Translate
-    - [Instructions Here](#Local-Text-Translation)
-  - There are two extra tools to align the captions: a Visual Scene Detector(Scene-timestamps), and a Human Voice Detector(Speech Timestamps)
-    - Often the captions align with those
-    - [Instructions Here](#Get-Event-Timestamps)
-  - You can use Whisper to translate a snapshot of what you are hearing from your speakers, using the Speakers-Stream thing
-    - [Instructions Here](#Translate-the-Speakers-Stream)
-## Setup
-### Model Setup
-used model: WHISPER  
-will download model *ggml-large.bin* from: [here](https://huggingface.co/datasets/ggerganov/whisper.cpp) 
-```
-make setup
+$ ./translate.sh -h
+./translate.sh: Automatically add subtitles to anime from raw video.
+
+Usage: ./translate.sh [ options ] input_file
+
+Options:
+    -h          Show this help and exit.
+    -o outfile  Write output video to outfile.
+    -s value    Synchronise subtitles using the provided model, or don't
+                synchronise if value is off.
+                  (off, tiny, base, small (default), medium, large)
+    -m value    Specify the model to use when extracting subtitles from the
+                raw audio.
+                  (tiny, base, small, medium, large (default))
+    -d dir      Generate intermediary files in dir and do not delete dir once
+                work is done.
+    -w dir      Specify the location of the whisper.cpp clone to use. If
+                provided, automatic download/update and compilation is
+                disabled.
+    -p num      Specify the number of processors to use (splits audio into
+                separate chunks processed in parallel, default 1).
+    -t num      Specify the number of threads to use on each processor
+                (default 4).
 ```
 
-#### Model Usage
-get audio from video file for *whisper* to use
-``` 
-useWhisper
-``` 
-the -tr flag activates translation into english, without it transcribes into japanese
-##### Warning
-- whisper often breaks with music segments  
-- if you see it start outputing the same thing over and over, interrupt it
-  - then use the -ot *milliseconds* flag to resume at that point
-- After interrupting, copy from Terminal, then format appropriately with:
-```
-formatToVtt
-```
-### MPV 
-get mpv to load some subs
-``` 
-mpvLoadSubs
-``` 
-what subs?  
-git clone https://github.com/tekakutli/anime_translation/
+## Manual translation & extra features
 
-### VTT efficient creation or edit
-I use *subed*  
-git clone https://github.com/sachac/subed  
-add *Subed* from *configAdd.el* to Emacs *config.el*  
-alternatively, add this extra:  
-git clone https://gist.github.com/mooseyboots/d9a183795e5704d3f517878703407184  
-add *Subed Extra Section* from *configAdd.el* to Emacs *config.el*  
-### AutoSync the Subs
-This ffsubsync-script first autosyncs japanese captions with japanese audio, and then uses those timestamps to sync english captions to japanese captions.  
-The japanese captions only need to be phonetically close, which means that we could use a smaller-faster model to get them instead, *ggml-small.bin*, [here](https://huggingface.co/datasets/ggerganov/whisper.cpp/tree/main).  
-This is the reason behind the names, why some are called whisper_small vs whisper_large (the model used).
+### Dependencies
+The dependencies in `Quick Start` are also needed.
+- Bash, MPV, ffmpeg and python3 for basic usage
+- emacs and subed for manually editing subtitles
+- Docker and docker-compose for grammar checking and Opus-MT
+- Pipewire, wl-copy and wl-paste for live speaker translation
+  - wl-copy and wl-paste are "optional" and can be removed from `snippets/streamtranslate.sh` if needed.
+
+### Usage
+First, edit `snippets/environmentvariables.sh` with the appropriate values for your setup.
+
+Then, source the snippet files to load the helper functions into your shell:
+```bash
+$ source snippets/enviromentvariables.sh
+$ source snippets/functions.sh
+$ source snippets/opus.sh
+$ source snippets/timeformat.sh
 ```
-make installffsubsync
-autosync
+
+#### General workflow
+This is a quick overview, you can find out more by reading about the tools used on their own websites:
+- [whisper.cpp](https://github.com/ggerganov/whisper.cpp), a more performant C++ port of [OpenAI Whisper](https://github.com/openai/whisper)
+- [ffmpeg](https://ffmpeg.org/), a tool for manipulating video & video related file formats
+- [emacs](https://www.gnu.org/software/emacs/) and its [subed plugin](https://github.com/sachac/subed)
+- [Docker](https://www.docker.com/) and [Pipewire](https://pipewire.org/)
+
+##### Step 1 (setup, can be skipped on future runs): Setup whisper.cpp
+Download and compile [whisper.cpp](https://github.com/ggerganov/whisper.cpp):
+```bash
+$ git clone https://github.com/ggerganov/whisper.cpp
+$ cd whisper.cpp
+$ make
 ```
-### Other Utils
-To .srt Conversion
+
+Download the models we will use to transcribe/translate our video:
 ```
-vttToSrt subs.vtt
+$ bash models/download_ggml_model.sh <model>
 ```
-Export final .mp4 with subtitles
+Where `<model>` is the model you want to download. Run the script without specifying a model to see a list of available models, but don't download one of the ones suffixed with `.en` as they cannot perform translation.
+
+Information about model size and memory usage can be found [here](https://github.com/ggerganov/whisper.cpp#memory-usage).
+
+I recommend using the `large` model for the best results. If you're going to synchronise the subtitles, you should also download the `small` model as synchronisation doesn't need precise subtitles.
+
+##### Step 2: Prepare input data
+Get a hold of the raw video you want to translate. The format doesn't matter as long as it is supported by ffmpeg, and I will be referring to it as `input.mp4` from here on.
+
+Extract the audio from it in WAV format for whisper.cpp to process:
+```bash
+$ ffmpeg -i input.mp4 -ar 16000 -ac 1 -c:a pcm_s16le input_audio.wav
 ```
-exportSubs
+
+##### Step 3: Generate subtitles
+Using whisper, generate translated subtitles from the input audio:
+```bash
+$ whisper.cpp/main \
+    -m whisper.cpp/models/ggml-<model>.bin \
+    -l ja \
+    -tr \
+    -ovtt \
+    -mc 10 \
+    -f input_audio.wav
+$ mv input_audio.wav.vtt english.vtt
 ```
-To format a given time in milliseconds or as timestamps, example:
+Where `<model>` is the model you downloaded earlier to extract subtitles.
+
+This step can take a while depending on your hardware and chosen model. Setting `--threads n` and `--processors n` to match your PC's specs can help a lot.
+
+Without the `-mc 10` option, whisper can break with music segments, and sometimes starts repeating its output. If that happens, interrupt the process and copy the output in the terminal. You can then format it using the `formatToVtt <file>` helper, which converts the whisper.cpp terminal output in `<file>` to VTT format in `<file>.vtt`. You can then manually merge all the converted segments later.
+
+Once you've converted the terminal output, resume whisper with the `-ot <millis>` flag at the point it left off.
+
+##### Step 4 (optional): Synchronise subtitles
+Sometimes, whisper's subtitles aren't completely synchronised with the video. If that happens, we can use `ffsubsync` to synchronise them.
+
+First, generate a japanese transcription of the video for ffsubsync to use:
+```bash
+$ whisper.cpp/main \
+    -m whisper.cpp/models/ggml-<model>.bin \
+    -l ja \
+    -mc 10 \
+    -ovtt \
+    -f input_audio.wav
+$ mv input_audio.wav.vtt japanese.vtt
 ```
-#timeformat.sh has these two commodity functions:
-milliformat "2.3" #2 minutes 3 seconds
-stampformat "3.2.1" #3 hours 2 minutes 1 second
+Where `<model>` is the model you downloaded for subtitle synchronisation. Notice that the `-tr` flag is removed from the command we used earlier, and that the `-su` flag is added - this speeds up conversion at the cost of accuracy, which we don't need as long as the subtitles are phonetically close to the raw video.
+
+Convert the english and japanese VTT files to SRT for ffsubsync to use:
+```bash
+$ ffmpeg -i english.vtt english.srt
+$ ffmpeg -i japanese.vtt japanese.srt
 ```
-#### Grammar-Spelling Checking Language-Tool
-Install full-version of Language Tool
+
+Using ffsubsync, first synchronise our japanese subtitles to the video, then our english subtitles to the japanese subtitles:
+```bash
+$ ffsubsync input.mp4 --max-offset-seconds .1 --gss -i japanese.srt -o japanese_synchronised.srt
+$ ffsubsync japanese_synchronised.srt --max-offset-seconds -i english.srt -o english_synchronised.srt
 ```
-make installlanguagetool
+
+Finally, convert the result back to VTT:
+```bash
+$ ffmpeg -i english_synchronised.srt english_synchronised.vtt
 ```
-Activate it
+
+##### Step 5 (optional): Manually correct subtitles
+This step is opinionated. You can manually adjust the `english_synchronised.vtt` file however you like.
+
+###### Subed
+I use *subed*:
+```bash
+$ git clone https://github.com/sachac/subed  
 ```
-languagetool
+Add *Subed* from *configAdd.el* to Emacs *config.el*:
+alternatively, add this extra:
+```bash
+$ git clone https://gist.github.com/mooseyboots/d9a183795e5704d3f517878703407184  
 ```
-add LanguageTool section from configAdd.el to Emacs config.el  
+Add *Subed Extra Section* from *configAdd.el* to Emacs *config.el*  
+
+Subed allows us to:
+- Watch where are captioning in MPV
+- Efficiently move, merge, split the timestamps, with precision.
+
+###### Language-Tool
+Install full-version of Language Tool:
+```bash
+$ make installlanguagetool
+```
+Activate it:
+```bash
+$ languagetool
+```
+
+Add LanguageTool section from configAdd.el to Emacs config.el  
 Emacs use:
 ```
 (langtool-check)
 ```
+
+#### Viewing & exporting subtitles
+We can use MPV to preview our created subtitles without exporting them:
+```bash
+$ mpv --sub-file="<subs>" input.mp4
+```
+Where `<subs>` is the final subtitles file.
+
+Finally, we can use ffmpeg to export our subtitles + input video into a single output video:
+```bash
+$ ffmpeg i- input.mp4 -i "<subs>" -c copy -c:s mov_text output.mp4
+```
+Where `<subs>` is the final subtitles file.
+
+### Extra tools
 #### Local Text Translation
-your FROM-TO model is either [here](https://github.com/Helsinki-NLP/Opus-MT-train/tree/master/models) or [here](https://github.com/Helsinki-NLP/Tatoeba-Challenge/tree/master/models)  
-example, to get the models I use:
+The Opus Model is a text-to-text translator model, like Google-Translate.
+
+Your FROM-TO model is either [here](https://github.com/Helsinki-NLP/Opus-MT-train/tree/master/models) or [here](https://github.com/Helsinki-NLP/Tatoeba-Challenge/tree/master/models)  
+As an example, to get the models I use:
+```bash
+$ make opusInstallExample
 ```
-make opusInstallExample
+
+Edit `$PATH_TO_SUBS/Opus-MT/services.json` appropriately, then:
+```bash
+$ make installopus
 ```
-edit PATH_TO_SUBS/Opus-MT/services.json appropriately, then:
-```
-make installopus
-```
+
 To activate:
-```
-#opus.sh has commodity functions
-Opus-MT
+```bash
+# opus.sh has commodity functions
+$ Opus-MT
 ```
 To use: 
+```bash
+$ t "text to translate"
 ```
-t "text to translate"
-```
-### Get Event Timestamps
-#### Scene-timestamps
-Visual Scene timestamps:
-```
-make installSceneTimestamps
 
-sceneTimestamps
+#### Get Event Timestamps
+##### Scene-timestamps
+Visual Scene timestamps:
+```bash
+$ make installSceneTimestamps
+$ sceneTimestamps
 ```
-#### VAD, Speech timestamps
+
+##### VAD, Speech timestamps
 What is VAD? VAD means: Voice Activity Detector  
 It gives you the speech timestamps, when human voice is detected  
 first install [torch](https://pytorch.org/get-started/locally/), then:
+```bash
+$ speechTimestamps
 ```
-speechTimestamps
-```
-### Translate the Speakers-Stream
-you'll need to Ctrl-C to stop recording, after which it will translate the temporal recording
-```
-streamtranslate
-```
-if you were to have sway, you could put this in your sway config, and have an easy keybinding to translate what you are hearing
 
+#### Translate your Speakers
+You'll need to Ctrl-C to stop recording, after which it will translate the temporal recording:
+```bash
+$ streamtranslate
+```
+
+Ff you are using sway, you can put this in your sway config, and have an easy keybind to translate what you are hearing:
 ```
 bindsym $mod+Shift+return exec alacritty -e bash /home/$USER/files/code/anime_translation/snippets/streamtranslate.sh
 ```
-## Dependencies
-- Linux, Bash, Mpv, Ffmpeg, Emacs, Subed
-- Whatever model you wish to use
-- Python if you use the "Get Event Timestamps" things
-  - The vad.py thing downloads silero-vad by itself 
-- Docker for the LibreGrammar(Language Tool) or the Opus things
-- If you want to translate your Speakers, you need pipewire 
-  - As commodity, you will need: wl-copy and wl-paste, if running on wayland
-    - If you don't want them, remove them from streamtranslate.sh
+
 ## Why X
 - Why Git over Google-Docs or similar?  
   - Version Control Systems (git) is an ergonomic tool to pick or disregard from contributions, it enables trully parallel work distribution

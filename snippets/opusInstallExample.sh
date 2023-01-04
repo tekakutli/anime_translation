@@ -4,7 +4,7 @@
 # will download: zho-eng eng-zho ja-en, to your PATH_TO_MODELS
 # and rename the downloaded directories to those short-hand names
 
-cd $PATH_TO_MODELS
+cd "$PATH_TO_MODELS"
 mkdir ja-en
 wget https://object.pouta.csc.fi/OPUS-MT-models/ja-en/opus-2019-12-18.zip
 unzip opus-2019-12-18.zip -d ja-en
